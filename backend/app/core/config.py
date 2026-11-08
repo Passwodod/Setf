@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     telegram_bot_token: SecretStr = Field(default=SecretStr(""))
     telegram_webhook_secret: SecretStr = Field(default=SecretStr(""))
     embedding_dim: int = 1536
+    ai_provider: str = ""  # "openai" | "mock" (mock is refused when SIA_ENV=production) | "" = AI disabled
+    ai_model: str = "gpt-4.1-mini"
+    ai_embedding_model: str = "text-embedding-3-small"
+    openai_base_url: str = "https://api.openai.com/v1"
     public_url: str = ""  # https base URL used to register the Telegram webhook
     admin_telegram_ids: str = ""  # comma-separated numeric Telegram user IDs allowed to use the admin bot
     session_encryption_keys: SecretStr = Field(default=SecretStr(""))  # comma-separated Fernet keys, newest first
