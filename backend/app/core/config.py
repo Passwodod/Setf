@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     telegram_bot_token: SecretStr = Field(default=SecretStr(""))
     telegram_webhook_secret: SecretStr = Field(default=SecretStr(""))
     embedding_dim: int = 1536
+    session_encryption_keys: SecretStr = Field(default=SecretStr(""))  # comma-separated Fernet keys, newest first
 
     @model_validator(mode="after")
     def _require_secret(self):

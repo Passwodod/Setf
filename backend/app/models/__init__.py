@@ -16,6 +16,7 @@ from app.models.knowledge import (
     TopicCategory,
     TopicMention,
 )
+from app.models.telegram import TelegramAccount, TelegramImportRun, TelegramSource
 from app.models.people import Group, GroupMember, Message, MessageSource, Person, PersonIdentifier
 
 __all__ = [
@@ -23,5 +24,5 @@ __all__ = [
     "DataRequest", "Embedding", "Evidence", "Group", "GroupMember", "InteractionEvent", "Interest",
     "Interview", "InterviewAnswer", "Message", "MessageSource", "Observation", "Person",
     "PersonIdentifier", "PersonInterest", "ProfessionalInformation", "Project", "SocialConnection",
-    "SystemSetting", "Timeline", "TopicCategory", "TopicMention", "User",
+    "SystemSetting", "TelegramAccount", "TelegramImportRun", "TelegramSource", "Timeline", "TopicCategory", "TopicMention", "User",
 ]

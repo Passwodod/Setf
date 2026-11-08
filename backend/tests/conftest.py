@@ -6,6 +6,8 @@ os.environ["SIA_DATABASE_URL"] = "postgresql+asyncpg://sia:sia_dev_pw@localhost:
 os.environ["SIA_REDIS_URL"] = "redis://localhost:6379/15"
 os.environ["SIA_JWT_SECRET"] = "test-secret-test-secret-test-secret-0123"
 os.environ["SIA_ALLOW_REGISTRATION"] = "true"
+from cryptography.fernet import Fernet  # noqa: E402
+os.environ["SIA_SESSION_ENCRYPTION_KEYS"] = Fernet.generate_key().decode()
 os.environ["SIA_RATE_LIMIT_LOGIN_PER_MINUTE"] = "1000"
 
 import httpx  # noqa: E402
