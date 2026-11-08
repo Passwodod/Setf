@@ -1,0 +1,9 @@
+.env
+__pycache__/
+.venv/
+node_modules/
+.next/
+*.pyc
+infrastructure/backups/*
+!infrastructure/backups/.gitkeep
+dump.rdb
