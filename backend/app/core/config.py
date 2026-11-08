@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     telegram_bot_token: SecretStr = Field(default=SecretStr(""))
     telegram_webhook_secret: SecretStr = Field(default=SecretStr(""))
     embedding_dim: int = 1536
+    public_url: str = ""  # https base URL used to register the Telegram webhook
+    admin_telegram_ids: str = ""  # comma-separated numeric Telegram user IDs allowed to use the admin bot
     session_encryption_keys: SecretStr = Field(default=SecretStr(""))  # comma-separated Fernet keys, newest first
 
     @model_validator(mode="after")
@@ -36,3 +38,8 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+def admin_ids() -> set[int]:
+    raw = get_settings().admin_telegram_ids
+    return {int(x) for x in raw.replace(" ", "").split(",") if x.isdigit()}

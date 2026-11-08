@@ -15,7 +15,7 @@ Legend: ✅ implemented and covered by passing automated tests · ⬜ not starte
 | Health checks, Dockerfile, docker-compose, Caddy, backup/restore scripts, CI | written, **not executed** (no Docker in the dev sandbox) |
 | §29 MTProto accounts (Telethon): connect, 2FA, reauth, multi-account, encrypted sessions, explicit sources, consent gating, dedup import, disconnect+erase | ✅ backend, read-only; tested with a fake gateway, NOT against live Telegram; dashboard pages ⬜ |
 | §28 multilingual: detection, slang/translit/typo lexicon with ambiguity handling, cross-language concepts and search | ✅ deterministic layer; LLM semantic layer ⬜ (Phase 4, needs OpenAI key) |
-| Telegram bot (aiogram, webhook, menu, commands) | ⬜ Phase 2 |
+| Phase 2 bot (aiogram 3): secret-verified webhook + update dedup, admin-only gate, person mgmt, signed consent invites + /revoke, approval center (SEND/EDIT/REJECT, exactly-once send, expiry, consent re-check) | ✅ tested against a recording fake Bot API, **not live Telegram**; REGENERATE and AI commands need the AI engine ⬜ |
 | Group collection, consent flows, retention, deletion/export | ⬜ Phase 3 |
 | AI engine (extraction, interests, topics, RAG, hybrid search) | ⬜ Phase 4 |
 | Web dashboard (Next.js) | ⬜ Phase 5 |

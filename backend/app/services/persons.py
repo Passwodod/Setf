@@ -86,3 +86,17 @@ async def delete_person(session: AsyncSession, owner_id: uuid.UUID, person_id: u
     await session.execute(delete(Embedding).where(Embedding.owner_id == owner_id, Embedding.person_id == person.id))
     await session.delete(person)
     await audit(session, owner_id=owner_id, actor=actor, action="person.delete", entity_type="person", entity_id=person_id)
+
+
+async def find_persons(session: AsyncSession, owner_id: uuid.UUID, query: str, limit: int = 10) -> list[Person]:
+    """Resolve a bot argument: full UUID, or case-insensitive name fragment."""
+    query = query.strip()
+    try:
+        pid = uuid.UUID(query)
+        p = await session.scalar(select(Person).where(Person.id == pid, Person.owner_id == owner_id))
+        return [p] if p else []
+    except ValueError:
+        pass
+    stmt = (select(Person).where(Person.owner_id == owner_id, Person.display_name.ilike(f"%{_escape_like(query)}%", escape="\\"))
+            .order_by(Person.display_name).limit(limit))
+    return list((await session.scalars(stmt)).all())

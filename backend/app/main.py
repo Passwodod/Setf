@@ -17,9 +17,24 @@ log = logging.getLogger("sia")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    settings = get_settings()
+    from app.bot.factory import get_bot
+
+    bot = get_bot()
+    if bot is not None and settings.public_url and settings.telegram_webhook_secret.get_secret_value():
+        try:
+            await bot.set_webhook(f"{settings.public_url.rstrip('/')}/api/v1/telegram/webhook",
+                                  secret_token=settings.telegram_webhook_secret.get_secret_value(),
+                                  allowed_updates=["message", "callback_query"], drop_pending_updates=False)
+        except Exception:
+            log.exception("could not register Telegram webhook")
     yield
+    if bot is not None:
+        await bot.session.close()
     await close_redis()
     await dispose_engine()
+
+
 
 
 def create_app() -> FastAPI:
