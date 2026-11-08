@@ -13,7 +13,7 @@ from app.services import approvals as svc
 from app.services.telegram_send import AiogramSender
 
 router = Router(name="approvals")
-router.message.filter(IsAdmin())
+router.message.filter(IsAdmin(), F.chat.type == "private")
 router.callback_query.filter(IsAdmin())
 
 EDIT_KEY = "bot:edit:{}"

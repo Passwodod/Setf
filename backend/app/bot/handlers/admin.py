@@ -13,7 +13,7 @@ from app.services import persons as persons_svc
 from app.services.consent_invite import make_token
 
 router = Router(name="admin")
-router.message.filter(IsAdmin())
+router.message.filter(IsAdmin(), F.chat.type == "private")
 router.callback_query.filter(IsAdmin())
 
 NOT_BUILT = "This needs the AI engine, which is not implemented yet."

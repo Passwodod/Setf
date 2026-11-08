@@ -53,11 +53,11 @@ class IsAdmin(BaseFilter):
 
 
 def build_dispatcher() -> Dispatcher:
-    from app.bot.handlers import admin, approvals, consent, fallback
+    from app.bot.handlers import admin, approvals, consent, fallback, groups
 
     dp = Dispatcher()
     dp.update.outer_middleware(DbAndAdminMiddleware())
-    dp.include_routers(consent.router, approvals.router, admin.router, fallback.router)
+    dp.include_routers(consent.router, approvals.router, admin.router, groups.router, fallback.router)
     return dp
 
 

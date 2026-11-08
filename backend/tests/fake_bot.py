@@ -15,6 +15,7 @@ class RecordingSession(BaseSession):
         self.calls: list[tuple[str, dict]] = []
         self.forbidden_chats: set[int] = set()
         self.failed: list[dict] = []
+        self.bot_is_admin = True
         self._id = 1000
 
     async def make_request(self, bot, method, timeout=None):
@@ -23,6 +24,13 @@ class RecordingSession(BaseSession):
             self.failed.append(data)
             raise TelegramForbiddenError(method=method, message="Forbidden: bot was blocked by the user")
         self.calls.append((method.__api_method__, data))
+        if method.__api_method__ == "getChatMember":
+            from aiogram.types import ChatMemberAdministrator, ChatMemberMember
+
+            u = User(id=1, is_bot=True, first_name="SIA", username="sia_test_bot")
+            if self.bot_is_admin:
+                return ChatMemberAdministrator.model_construct(status="administrator", user=u)
+            return ChatMemberMember(status="member", user=u)
         if isinstance(method, GetMe):
             return User(id=1, is_bot=True, first_name="SIA", username="sia_test_bot")
         chat_id = data.get("chat_id")

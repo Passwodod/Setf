@@ -16,6 +16,7 @@ from app.models import (
 from app.models.base import ConsentScope, ConsentStatus
 from app.security.crypto import decrypt_secret, encrypt_secret
 from app.services import consent as consent_svc
+from app.services import groups as groups_svc
 from app.services.audit import audit
 from app.services.mtproto import AuthRevoked, GatewayError, MTProtoGateway
 
@@ -226,11 +227,11 @@ async def run_import(session: AsyncSession, gw: MTProtoGateway, owner_id: uuid.U
 
         for m in msgs:
             author = ident.get(str(m.sender_id)) if m.sender_id is not None else None
-            if author in blocked:
+            if author in blocked or (m.sender_id is not None and await groups_svc.opted_out(session, owner_id, group.id, m.sender_id)):
                 run.skipped += 1
                 continue
             res = await session.execute(
-                pg_insert(Message).values(owner_id=owner_id, group_id=group.id, author_person_id=author,
+                pg_insert(Message).values(owner_id=owner_id, group_id=group.id, author_person_id=author, author_telegram_id=m.sender_id,
                                           telegram_message_id=m.id, text=m.text, sent_at=m.date)
                 .on_conflict_do_nothing(constraint="uq_messages_group_tgmsg").returning(Message.id))
             mid = res.scalar_one_or_none()

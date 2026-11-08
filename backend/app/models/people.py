@@ -95,6 +95,7 @@ class Message(Base, IdMixin):
     owner_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), FK_OWNER(), nullable=False)
     group_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("groups.id", ondelete="CASCADE"), nullable=False)
     author_person_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("persons.id", ondelete="SET NULL"))
+    author_telegram_id: Mapped[int | None] = mapped_column(BigInteger)
     telegram_message_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     reply_to_message_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("messages.id", ondelete="SET NULL"))
     text: Mapped[str] = mapped_column(Text, nullable=False)
@@ -108,6 +109,7 @@ class Message(Base, IdMixin):
         UniqueConstraint("group_id", "telegram_message_id", name="uq_messages_group_tgmsg"),
         Index("ix_messages_group_sent", "group_id", "sent_at"),
         Index("ix_messages_author_sent", "author_person_id", "sent_at"),
+        Index("ix_messages_group_author_tg", "group_id", "author_telegram_id"),
         Index("ix_messages_owner_unprocessed", "owner_id", postgresql_where="processed_at IS NULL"),
         Index("ix_messages_text_tsv", "text_tsv", postgresql_using="gin"),
     )
@@ -123,3 +125,19 @@ class MessageSource(Base, IdMixin):
     source: Mapped[str] = mapped_column(String(32), nullable=False)
     raw_update_id: Mapped[int | None] = mapped_column(BigInteger)
     retained_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class CollectionOptOut(Base, IdMixin):
+    """A Telegram user who asked not to be collected. Keyed by Telegram ID so it works for people
+    who have no profile. group_id NULL means every group of this owner."""
+
+    __tablename__ = "collection_opt_outs"
+
+    owner_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), FK_OWNER(), nullable=False)
+    group_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("groups.id", ondelete="CASCADE"))
+    telegram_user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    __table_args__ = (
+        Index("uq_collection_opt_outs_scope", "owner_id", func.coalesce(group_id, uuid.UUID(int=0)), "telegram_user_id", unique=True),
+    )

@@ -18,10 +18,10 @@ from app.models.knowledge import (
 )
 from app.models.telegram import TelegramAccount, TelegramImportRun, TelegramSource
 from app.models.jobs import BackgroundJob
-from app.models.people import Group, GroupMember, Message, MessageSource, Person, PersonIdentifier
+from app.models.people import CollectionOptOut, Group, GroupMember, Message, MessageSource, Person, PersonIdentifier
 
 __all__ = [
-    "BackgroundJob",
+    "BackgroundJob", "CollectionOptOut",
     "AiInsight", "Approval", "AuditLog", "Base", "ConsentRecord", "Conversation", "ConversationMessage",
     "DataRequest", "Embedding", "Evidence", "Group", "GroupMember", "InteractionEvent", "Interest",
     "Interview", "InterviewAnswer", "Message", "MessageSource", "Observation", "Person",
