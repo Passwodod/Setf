@@ -174,6 +174,25 @@ async def import_source(account_id: uuid.UUID, source_id: uuid.UUID, user: Curre
     return await svc.run_import(session, gw, user.id, acc, src, actor=f"user:{user.id}")
 
 
+@router.post("/accounts/{account_id}/sources/{source_id}/import/background", status_code=status.HTTP_202_ACCEPTED)
+async def import_source_background(account_id: uuid.UUID, source_id: uuid.UUID, user: CurrentUser, session: Session) -> dict:
+    """Queue the import for the worker; poll GET /api/v1/jobs/{id}. Repeated clicks reuse the pending job."""
+    from datetime import UTC, datetime
+
+    from app.jobs import queue
+
+    await enforce_rate_limit("tg-import", str(user.id), 20)
+    await _acc(session, user, account_id)
+    try:
+        await svc.get_source(session, user.id, account_id, source_id)
+    except svc.NotFound:
+        raise _nf() from None
+    bucket = datetime.now(UTC).strftime("%Y%m%d%H%M")  # one queued import per source per minute
+    job, created = await queue.enqueue(user.id, "telegram.import", {"account_id": str(account_id), "source_id": str(source_id)},
+                                       idempotency_key=f"{source_id}:{bucket}")
+    return {"job_id": str(job.id), "status": job.status, "created": created}
+
+
 @router.get("/accounts/{account_id}/imports", response_model=list[ImportRunOut])
 async def import_history(account_id: uuid.UUID, user: CurrentUser, session: Session,
                          limit: Annotated[int, Query(ge=1, le=100)] = 25) -> list[TelegramImportRun]:

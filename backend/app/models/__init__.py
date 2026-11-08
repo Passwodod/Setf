@@ -17,9 +17,11 @@ from app.models.knowledge import (
     TopicMention,
 )
 from app.models.telegram import TelegramAccount, TelegramImportRun, TelegramSource
+from app.models.jobs import BackgroundJob
 from app.models.people import Group, GroupMember, Message, MessageSource, Person, PersonIdentifier
 
 __all__ = [
+    "BackgroundJob",
     "AiInsight", "Approval", "AuditLog", "Base", "ConsentRecord", "Conversation", "ConversationMessage",
     "DataRequest", "Embedding", "Evidence", "Group", "GroupMember", "InteractionEvent", "Interest",
     "Interview", "InterviewAnswer", "Message", "MessageSource", "Observation", "Person",
